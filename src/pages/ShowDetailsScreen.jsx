@@ -1,5 +1,3 @@
-// ShowDetailsScreen.js
-
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import MovieDetailsForm from "../components/MovieDetailsForm";
@@ -12,6 +10,27 @@ const ShowDetailsScreen = () => {
   const { id } = useParams();
   const [loader, setLoader] = useState(false);
   const [arr1, setArr1] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [formData, setFormData] = useState({
+    userName: "",
+    movieName: "",
+  });
+
+  const onChangeHandler = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     const getMovieDetailsFunc = (id) => {
@@ -21,6 +40,7 @@ const ShowDetailsScreen = () => {
           if (res.status === 200) {
             setShow(res?.data);
             setArr1(res?.data?.genres);
+            setFormData({ ...formData, movieName: res?.data?.name });
             setLoader(false);
           } else {
             console.log(res);
@@ -34,12 +54,10 @@ const ShowDetailsScreen = () => {
     getMovieDetailsFunc(id);
   }, [id]);
 
-  const handleFormSubmit = (event, selectedShow) => {
-    event.preventDefault();
-    console.log("Form submitted for:", selectedShow);
+  const handleFormSubmit = () => {
+    localStorage.setItem("User Name", formData.userName);
+    localStorage.setItem("Movie Name", formData.movieName);
   };
-
-  console.log(show);
 
   return (
     <>
@@ -60,12 +78,34 @@ const ShowDetailsScreen = () => {
         </div>
       ) : (
         <>
+          <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <button
+              type="button"
+              className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto"
+              onClick={() => {
+                openModal();
+              }}
+            >
+              Book Ticket
+            </button>
+            <button
+              type="button"
+              className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              onClick={() => {
+                window.history.back();
+              }}
+            >
+              Back
+            </button>
+          </div>
           <main>
             <article>
-              <header className="mx-auto max-w-screen-xl pt-24 text-center">
+              <header className="mx-auto max-w-screen-xl mt-5 text-center">
                 <p className="text-gray-500">
                   Premiered-{" "}
-                  <span className="text-blue-500">{show?.premiered || 'N/A'} </span>
+                  <span className="text-blue-500">
+                    {show?.premiered || "N/A"}{" "}
+                  </span>
                 </p>
                 <h1 className="mt-2 text-3xl font-bold text-gray-900 sm:text-5xl">
                   {show?.name}
@@ -88,24 +128,15 @@ const ShowDetailsScreen = () => {
                     <span className="text-gray-600">/10</span>
                   </p>
                   <span className="w-1 h-1 bg-gray-500 rounded-full dark:bg-gray-400"></span>
-                  <a
-                    //href="#"
-                    className="text-sm font-medium text-gray-900 hover:no-underline dark:text-white"
-                  >
+                  <a className="text-sm font-medium text-gray-900 hover:no-underline dark:text-white">
                     {show?.runtime} min
                   </a>
                   <span className="w-1 h-1 bg-gray-500 rounded-full dark:bg-gray-400"></span>
-                  <a
-                    //href="#"
-                    className="text-sm font-medium text-gray-900 hover:no-underline dark:text-white"
-                  >
+                  <a className="text-sm font-medium text-gray-900 hover:no-underline dark:text-white">
                     {show?.language}
                   </a>
                   <span className="w-1 h-1 bg-gray-500 rounded-full dark:bg-gray-400"></span>
-                  <a
-                    //href="#"
-                    className="text-sm font-medium text-gray-900 hover:no-underline dark:text-white"
-                  >
+                  <a className="text-sm font-medium text-gray-900 hover:no-underline dark:text-white">
                     {show?.status}
                   </a>
                 </div>
@@ -150,9 +181,84 @@ const ShowDetailsScreen = () => {
               </div>
             </article>
           </main>
-
-          <MovieDetailsForm show={show} onSubmit={handleFormSubmit} />
         </>
+      )}
+
+      {isModalOpen && (
+        <div
+          className="relative z-10"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+              <div className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 text-green-600"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#000000"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M3 9V7a2 2 0 012-2h14a2 2 0 012 2v2M3 15v2a2 2 0 002 2h14a2 2 0 002-2v-2" />
+                        <path d="M21 15a3 3 0 110-6" />
+                        <path d="M3 15a3 3 0 100-6" />
+                        <path d="M13 5v2" />
+                        <path d="M13 17v2" />
+                        <path d="M13 11v2" />
+                      </svg>
+                    </div>
+                    <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                      <h1
+                        className="text-gray-900 text-xl"
+                      >
+                        Book Ticket
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white px-4">
+                  <div className="mt-2 w-100">
+                    <MovieDetailsForm
+                      show={show}
+                      onChangeHandler={onChangeHandler}
+                    />
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  <button
+                    type="button"
+                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                    onClick={() => {
+                      handleFormSubmit();
+                      closeModal();
+                    }}
+                  >
+                    Book
+                  </button>
+                  <button
+                    type="button"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

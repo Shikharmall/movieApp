@@ -62,7 +62,7 @@ const HomeScreen = () => {
 
   return (
     <>
-      <div className="bg-white pb-2 pt-5 dark:bg-dark lg:pb-5">
+      <div className="bg-white pb-1 pt-5 ">
         <div className="mx-4 flex flex-wrap">
           <div className="w-full px-4">
             <div className="mx-auto mb-[60px] max-w-[510px] text-center lg:mb-20">
@@ -72,12 +72,6 @@ const HomeScreen = () => {
               <h2 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px]">
                 All Recent Movies
               </h2>
-              <p className="text-base text-body-color dark:text-dark-6">
-                Dive into the latest and greatest with our All Recent Movies
-                collection. Stay in the cinematic loop, experiencing the best of
-                contemporary storytelling - a thrilling blend of excitement,
-                emotion, and unique cinematic moments.
-              </p>
             </div>
           </div>
         </div>
