@@ -8,30 +8,29 @@ const HomeScreen = () => {
   const [shows, setShows] = useState([]);
   const navigate = useNavigate();
 
-  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage, setPostsPerPage] = useState(6);
+
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+
+  const [search, setSearch] = useState("");
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const filterhoadata = (e) => {
+    setSearch(e.target.value);
+    paginate(1);
+  };
+
+  const rowperpage = (number) => setPostsPerPage(number);
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(6);
   const [loader, setLoader] = useState(false);
-  const [totalBlogs, setTotalBlogs] = useState(0);
-  const [sortBy, setSortBy] = useState("createdAt");
-  const [filterCategory, setFilterCategory] = useState("");
-  const [sortOrder, setSortOrder] = useState("desc");
-  const [filterdata, setFilterdata] = useState("");
-
-  const options = [
-    { value: "Technology", label: "Technology" },
-    { value: "Health", label: "Health" },
-    { value: "Finance", label: "Finance" },
-    { value: "Travel", label: "Travel" },
-    { value: "Food", label: "Food" },
-    { value: "Fashion", label: "Fashion" },
-    { value: "Lifestyle", label: "Lifestyle" },
-    { value: "Parenting", label: "Parenting" },
-    { value: "Fitness", label: "Fitness" },
-  ];
 
   const handlePageChange = (newPage) => {
-    setPage(newPage);
+    paginate(newPage);
   };
 
   useEffect(() => {
@@ -40,7 +39,7 @@ const HomeScreen = () => {
       try {
         getAllMoviesDataAPI().then((res) => {
           if (res.status === 200) {
-            setShows(res?.data)
+            setShows(res?.data);
             setLoader(false);
           } else {
             console.log(res);
@@ -55,34 +54,42 @@ const HomeScreen = () => {
   }, []);
 
   const handleShowDetails = (show) => {
-    //history.push(`/show/${show.id}`);
     navigate(`/show/${show.id}`);
   };
 
-  console.log(shows);
+  const filteredShowsData = shows
+    .filter((item) => {
+      return (
+        search.toLowerCase() === "" ||
+        item.show.name.toLowerCase().includes(search.toLowerCase())
+      );
+    })
+    .slice(indexOfFirstPost, indexOfLastPost);
 
   return (
     <>
-      <div className="bg-white pb-5 pt-5 dark:bg-dark lg:pb-5">
+      <div className="bg-white pb-2 pt-5 dark:bg-dark lg:pb-5">
         <div className="mx-4 flex flex-wrap">
           <div className="w-full px-4">
             <div className="mx-auto mb-[60px] max-w-[510px] text-center lg:mb-20">
               <span className="mb-2 block text-lg font-semibold text-primary">
-                Our Blogs
+                Popular Movies
               </span>
               <h2 className="mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px]">
-                Our Recent News
+                All Recent Movies
               </h2>
               <p className="text-base text-body-color dark:text-dark-6">
-                Discover captivating stories and insightful perspectives in our
-                latest posts. Embark on a journey of exploration with us!
+                Dive into the latest and greatest with our All Recent Movies
+                collection. Stay in the cinematic loop, experiencing the best of
+                contemporary storytelling - a thrilling blend of excitement,
+                emotion, and unique cinematic moments.
               </p>
             </div>
           </div>
         </div>
 
         <div className="mx-auto grid max-w-screen-lg justify-center px-4 sm:grid-cols-2 sm:gap-6 sm:px-8 md:grid-cols-4">
-          <div className="col-span-1 md:col-span-1">
+          {/*<div className="col-span-1 md:col-span-1">
             <div className="relative p-2">
               <div>
                 <label className="sr-only">Select Category:</label>
@@ -118,8 +125,8 @@ const HomeScreen = () => {
                 </select>
               </div>
             </div>
-          </div>
-          <div className="col-span-2 md:col-span-2">
+          </div>*/}
+          <div className="col-span-4 md:col-span-4 ">
             <div className="relative p-2 box-border">
               <label htmlFor="table-search" className="sr-only">
                 Search
@@ -146,11 +153,11 @@ const HomeScreen = () => {
                 id="table-search-users"
                 className="block p-3 pl-10 text-sm text-gray-500 border border-gray-300 placeholder-gray-400 rounded-lg w-full bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500 box-border"
                 placeholder="Search"
-                //value={filterdata}
-                //onChange={(e) => {
-                //  setFilterdata(e.target.value);
-                //  setPage(1);
-                //}}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  //setPage(1);
+                }}
               />
             </div>
           </div>
@@ -176,13 +183,13 @@ const HomeScreen = () => {
             <div className="mx-auto grid max-w-screen-lg justify-center px-4 sm:grid-cols-2 sm:gap-6 sm:px-8 md:grid-cols-3">
               {shows && shows.length > 0 ? (
                 <>
-                  {shows.map((show) => (
+                  {filteredShowsData.map((show) => (
                     <article
                       className="mx-auto my-4 flex flex-col overflow-hidden rounded-lg border border-gray-300 bg-white text-gray-900 transition hover:translate-y-2 hover:shadow-lg w-full"
                       key={show.show.id}
                     >
                       <ShowCard
-                        show={show.show}
+                        show={show?.show}
                         onShowDetails={handleShowDetails}
                       />
                     </article>
@@ -191,16 +198,16 @@ const HomeScreen = () => {
               ) : null}
             </div>
 
-            {/*{posts && posts.length > 0 ? null : (
+            {filteredShowsData && filteredShowsData.length > 0 ? null : (
               <div className="bg-white flex justify-center w-full">
-                <h1 className="p-3">No Blog Found..</h1>
+                <h1 className="p-3">No Result Found....</h1>
               </div>
             )}
 
             <div className="flex flex-row justify-center p-2 bg-white dark:bg-gray-800 rounded-bl-lg rounded-br-lg">
-              {totalBlogs !== 0 ? (
+              {shows.length !== 0 ? (
                 <a className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                  {page} of {Math.ceil(totalBlogs / limit)}
+                  {page} of {Math.ceil(shows.length / limit)}
                 </a>
               ) : (
                 <a className="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
@@ -214,7 +221,7 @@ const HomeScreen = () => {
               >
                 Previous
               </button>
-              {totalBlogs !== 0 ? (
+              {shows.length !== 0 ? (
                 <a className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover-bg-gray-100 hover-text-gray-700 dark-bg-gray-800 dark-border-gray-700 dark-text-gray-400 dark-hover-bg-gray-700 dark-hover-text-white">
                   {page}
                 </a>
@@ -226,12 +233,12 @@ const HomeScreen = () => {
 
               <button
                 className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-r-lg hover-bg-gray-100 hover-text-gray-700 dark-bg-gray-800 dark-border-gray-700 dark-text-gray-400 dark-hover-bg-gray-700 dark-hover-text-white cursor-pointer"
-                disabled={page >= Math.ceil(totalBlogs / limit)}
+                disabled={page >= Math.ceil(shows.length / limit)}
                 onClick={() => handlePageChange(page + 1)}
               >
                 Next
               </button>
-              </div>*/}
+            </div>
           </>
         )}
       </div>
