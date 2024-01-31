@@ -18,19 +18,13 @@ const HomeScreen = () => {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-  const filterhoadata = (e) => {
-    setSearch(e.target.value);
-    paginate(1);
-  };
-
-  const rowperpage = (number) => setPostsPerPage(number);
-
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(6);
   const [loader, setLoader] = useState(false);
 
   const handlePageChange = (newPage) => {
     paginate(newPage);
+    setPage(newPage);
   };
 
   useEffect(() => {
@@ -89,43 +83,6 @@ const HomeScreen = () => {
         </div>
 
         <div className="mx-auto grid max-w-screen-lg justify-center px-4 sm:grid-cols-2 sm:gap-6 sm:px-8 md:grid-cols-4">
-          {/*<div className="col-span-1 md:col-span-1">
-            <div className="relative p-2">
-              <div>
-                <label className="sr-only">Select Category:</label>
-                <select
-                  //value={filterCategory}
-                  //onChange={(e) => setFilterCategory(e.target.value)}
-                  className="block p-3 pr-8  text-sm text-gray-500 border border-gray-300 placeholder-gray-400 rounded-lg w-full bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500 box-border"
-                >
-                  <option value="">All Category</option>
-                  {options.map((item, index) => (
-                    <option value={item.label} key={index}>
-                      {item.value}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-          <div className="col-span-1 md:col-span-1">
-            <div className="relative p-2">
-              <div>
-                <label className="sr-only">Sort By Time:</label>
-                <select
-                  //value={sortOrder}
-                  //onChange={(e) => setSortOrder(e.target.value)}
-                  className="block p-3 pr-8  text-sm text-gray-500 border border-gray-300 placeholder-gray-400 rounded-lg w-full bg-gray-50 focus:ring-gray-500 focus:border-gray-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-gray-500 dark:focus:border-gray-500 box-border"
-                >
-                  <option value="" disabled>
-                    Sort By Time
-                  </option>
-                  <option value="asc">Ascending</option>
-                  <option value="desc">Descending</option>
-                </select>
-              </div>
-            </div>
-          </div>*/}
           <div className="col-span-4 md:col-span-4 ">
             <div className="relative p-2 box-border">
               <label htmlFor="table-search" className="sr-only">
@@ -156,7 +113,8 @@ const HomeScreen = () => {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  //setPage(1);
+                  setPage(1);
+                  paginate(1);
                 }}
               />
             </div>
